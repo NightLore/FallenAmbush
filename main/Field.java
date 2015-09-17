@@ -30,15 +30,18 @@ public class Field
     public void addSprite( MovableSprite s, int i )
     {
         sprites[i].add( s );
+        while ( s.colliding( sprites ) || s.colliding( map.getTerrain() ) ) { 
+            s.setPosition( s.getX() + 1, s.getY() + 1 );
+            }
     }
     
     /**
      * Paints all sprites on field
      * @param g2d
      */
-    public void paint(  java.awt.Graphics2D g2d )
+    public void paint(  java.awt.Graphics g2d )
     {
-        map.paintAll( g2d );
+        map.paint( g2d );
         for ( SpriteGroup s : sprites )
         {
             s.paintAll( g2d );
@@ -56,17 +59,26 @@ public class Field
         for ( SpriteGroup s : sprites )
         {
             // System.out.println( "check" );
-            s.moveAll( sprites );
+            s.moveAll( sprites, map.getTerrain() );
         }
         if ( !sprites[PLAYERS].isAtCenter() )
         {
             Point p = getChange();
             map.setDirections( (int)p.getX(), (int)p.getY() );
             for ( SpriteGroup s : sprites )
-                for ( MovableSprite sp : s )
+                for ( int i = 0; i < s.size(); i++ )
                 {
+                    MovableSprite sp = s.get( i );
                     sp.move( (int)p.getX(), (int)p.getY() );
                     // System.out.println( sp/*.getName()*/ + ": " + sp.getRealX() + ", " + sp.getRealY() );
+                    if ( sp instanceof Weapon )
+                    {
+                        if ( !(((Weapon)sp).isActive()) )
+                        {
+                            s.remove( sp );
+                            i--;
+                        }
+                    }
                 }
             map.update();
         }

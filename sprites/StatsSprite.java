@@ -31,10 +31,22 @@ public class StatsSprite extends MovableSprite
         return stats;
     }
     
+    /** (non-Javadoc)
+     * @see sprites.MovableSprite#getSpeed()
+     */
     @Override
     public int getSpeed()
     {
         return getStats()[SPEED];
+    }
+    
+    /** (non-Javadoc)
+     * @see sprites.MovableSprite#getSpeed()
+     */
+    @Override
+    public void setSpeed( int newSpeed )
+    {
+        getStats()[SPEED] = newSpeed;
     }
     
     /**

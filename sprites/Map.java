@@ -2,6 +2,7 @@ package sprites;
 import static main.Constants.*;
 
 import java.awt.Point;
+import java.util.Random;
 
 
 /**
@@ -10,66 +11,83 @@ import java.awt.Point;
  *  @author  Nathan Lui
  *  @version Dec 24, 2014
  */
-public class Map extends SpriteGroup
+public class Map
 {
-    
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-    
-    
+    public static final Random RANDOM = new Random();
     private String[] maps = { "background.png", "background.png" };
     private int[] seed = { 0 };
+    private SpriteGroup floor;
+    private SpriteGroup terrain;
+    private int tileWidth;
+    private int tileHeight;
+    
 
     public Map()
     {
+        floor = new SpriteGroup();
+        terrain = new SpriteGroup();
         for ( int i = 0; i < 9; i++ ) {
             MovableSprite m = new MovableSprite( PACKAGE + maps[seed[i % seed.length] % maps.length] );
             if ( i % 2 == 0 ) 
                 m.flipHorizontal();
             else 
                 m.flipVertical();
-            m.setRefPixel( 0, 0 );
-            int w = m.getWidth();
-            int h = m.getHeight();
-            m.setPosition( -w + ( i % 3 ) * w, 
-                           -h + ( i / 3 ) * h );
-            m.setRefPixel( w / 2, h / 2 );
-            add( m );
+            tileWidth = m.getWidth();
+            tileHeight = m.getHeight();
+            m.setRefPixel( tileWidth / 2, tileHeight / 2 );
+            m.setPosition( -tileWidth + ( i % 3 ) * tileWidth, 
+                           -tileHeight + ( i / 3 ) * tileHeight );
+            floor.add( m );
         }
+        int n = RANDOM.nextInt( 10 ) + 10;
+        for ( int i = 0; i < n; i++ )
+        {
+            MovableSprite m = new MovableSprite( PACKAGE + "DarkGreen.png" );
+            m.setRefPixel( tileWidth / 2, tileHeight / 2 );
+            m.setPosition( RANDOM.nextInt( WINDOW_WIDTH ), RANDOM.nextInt( WINDOW_HEIGHT ) );
+            terrain.add( m );
+        }
+    }
+    
+    public void paint( java.awt.Graphics g ) 
+    {
+        floor.paintAll( g );
+        terrain.paintAll( g );
     }
     
     public void update()
     {
-        this.moveAll();
-        Point mCenter = getCenter();
-        if ( mCenter.getX() > CENTER.getX() + this.get( 0 ).getWidth() ) { // Too far east
-            for ( MovableSprite m : this ) {
-                if ( m.getX() > mCenter.getX() + m.getWidth() / 2 ) {
-                    m.setPosition( (int)CENTER.getX() - m.getWidth() + 1, m.getY()  );
-                }
+        floor.moveAll();
+        terrain.moveAll();
+        Point mCenter = floor.getCenter();
+        for ( MovableSprite m : floor ) {
+            adjustMapSprite( m, mCenter );
+        }
+        for ( MovableSprite m : terrain ) {
+            adjustMapSprite( m, mCenter );
+        }
+    }
+    
+    private void adjustMapSprite( MovableSprite m, Point mCenter )
+    {
+        if ( mCenter.getX() > CENTER.getX() + tileWidth * 3 / 4 ) { // Too far east
+            if ( m.getX() > mCenter.getX() + tileWidth / 2 ) {
+                m.setPosition( mCenter.x - 2 * tileWidth + 1, m.getY()  );
             }
         }
-        else if ( mCenter.getX() < CENTER.getX() - this.get( 0 ).getWidth() ) { // Too far west
-            for ( MovableSprite m : this ) {
-                if ( m.getX() < mCenter.getX() - m.getWidth() / 2 ) {
-                    m.setPosition( (int)CENTER.getX() + m.getWidth() - 1, m.getY() );
-                }
+        else if ( mCenter.getX() < CENTER.getX() - tileWidth * 3 / 4 ) { // Too far west
+            if ( m.getX() < mCenter.getX() - tileWidth / 2 ) {
+                m.setPosition( mCenter.x + 2 * tileWidth - 1, m.getY() );
             }
         }
-        if ( mCenter.getY() > CENTER.getY() + this.get( 0 ).getHeight() ) { // Too far south
-            for ( MovableSprite m : this ) {
-                if ( m.getY() > mCenter.getY() + m.getHeight() / 2 ) {
-                    m.setPosition( m.getX(), (int)CENTER.getY() - m.getHeight() + 1 );
-                }
+        if ( mCenter.getY() > CENTER.getY() + tileHeight * 3 / 4 ) { // Too far south
+            if ( m.getY() > mCenter.getY() + tileHeight / 2 ) {
+                m.setPosition( m.getX(), mCenter.y - 2 * tileHeight + 1 );
             }
         }
-        else if ( mCenter.getY() < CENTER.getY() - this.get( 0 ).getHeight() ) { // Too far north
-            for ( MovableSprite m : this ) {
-                if ( m.getY() < mCenter.getY() - m.getHeight() / 2 ) {
-                    m.setPosition( m.getX(), (int)CENTER.getY() + m.getHeight() - 1 );
-                }
+        else if ( mCenter.getY() < CENTER.getY() - tileHeight * 3 / 4 ) { // Too far north
+            if ( m.getY() < mCenter.getY() - tileHeight / 2 ) {
+                m.setPosition( m.getX(), mCenter.y + 2 * tileHeight - 1 );
             }
         }
     }
@@ -77,20 +95,22 @@ public class Map extends SpriteGroup
     public void setDirections( int x, int y )
     {
         stop();
-        if ( x > 0 ) 
-            this.setAllDeltas( EAST );
-        else if ( x < 0 ) 
-            this.setAllDeltas( WEST );
-        
-        if ( y > 0 )
-            this.setAllDeltas( SOUTH );
-        else if ( y < 0 )
-            this.setAllDeltas( NORTH );
+        int d;
+        d = ( x > 0 ) ? EAST : ( x < 0 ) ? WEST : -1;
+        floor.setAllDeltas( d );
+        terrain.setAllDeltas( d );
+
+        d = ( y > 0 ) ? SOUTH : ( y < 0 ) ? NORTH : -1;
+        floor.setAllDeltas( d );
+        terrain.setAllDeltas( d );
     }
     
     private void stop()
     {
-        for ( MovableSprite m : this ) {
+        for ( MovableSprite m : floor ) {
+            m.stop();
+        }
+        for ( MovableSprite m : terrain ) {
             m.stop();
         }
     }
@@ -98,5 +118,10 @@ public class Map extends SpriteGroup
     public void changeMapSeed( int[] seed )
     {
         this.seed = seed;
+    }
+    
+    public SpriteGroup getTerrain()
+    {
+        return terrain;
     }
 }

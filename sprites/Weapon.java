@@ -49,14 +49,14 @@ public class Weapon extends StatsSprite
     }
 
     @Override
-    public void move( SpriteGroup[] sprites )
+    public void move( SpriteGroup[] sprites, SpriteGroup terrain )
     {
         if ( this.getRealX() < -this.getWidth() || this.getRealX() > WINDOW_WIDTH 
           || this.getRealY() < -this.getHeight() || this.getRealY() > WINDOW_HEIGHT )
             setActive( false );
         if ( !isActive() )
             return;
-        super.move( sprites );
+        super.move( sprites, terrain );
         // if ( colliding( sprites ) );
     }
     
@@ -65,12 +65,16 @@ public class Weapon extends StatsSprite
     {
         if ( sprite != mySprite && super.collidesWith( sprite, pixelPerfect )  )
         {
-            StatsSprite s = (StatsSprite)sprite;
-            if ( FRIENDLY_FIRE || s.getStats()[TEAM] != this.getStats()[TEAM] ) // TODO check friendly fire
+            if ( sprite instanceof StatsSprite )
             {
-                s.getStats()[HP] -= 1;
-                setActive( false );
+                StatsSprite s = (StatsSprite)sprite;
+                if ( FRIENDLY_FIRE || s.getStats()[TEAM] != this.getStats()[TEAM] ) // TODO check friendly fire
+                {
+                    s.getStats()[HP] -= 1;
+                    setActive( false );
+                }
             }
+            return true;
         }
         return false;
     }

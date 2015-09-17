@@ -2,7 +2,6 @@ package main;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 
 import javax.swing.*;
 
@@ -65,6 +64,7 @@ public class Main extends JPanel implements ActionListener, KeyListener {
 //                if ( menuImage == null ) Painter.paintMenu( g, hasStarted );
 //                else 
 //                 g.drawImage( menuImage, 0, 0, null );
+                 super.paintComponents(g);
                 break;
             case GAME:
                 field.paint( g2d );
@@ -97,9 +97,13 @@ public class Main extends JPanel implements ActionListener, KeyListener {
             field.move();
             repaint();
         }
-        else if ( e.getActionCommand().equals( menuButtons[0] ) )
+        else
         {
-            System.out.println( "performed Action");
+            for ( String button : menuButtons )
+            if ( e.getActionCommand().equals( button ) )
+            {
+                System.out.println( "performed Action: " + button );
+            }
         }
     }
     
@@ -135,10 +139,10 @@ public class Main extends JPanel implements ActionListener, KeyListener {
             }
             if ( !menu.hasStarted() ) { 
                 menu.setHasStarted( true );
-//                for ( JButton b : menu.getButtons() )
-//                {
-//                    this.add( b );
-//                }
+                for ( JButton b : menu.getButtons() )
+                {
+                    this.add( b );
+                }
             }
             if ( field != null ) {
                 Player.KEYS.put( e.getKeyCode(), true );

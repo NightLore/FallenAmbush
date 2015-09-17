@@ -17,7 +17,13 @@ public class SpriteGroup extends ArrayList<MovableSprite> implements Serializabl
     public void setAllDeltas( int d )
     {
         for ( MovableSprite s : this ) {
-                s.setDelta( d );
+            s.setDelta( d );
+        }
+    }
+    
+    public void setAllSpeeds( int newSpeed ) {
+        for ( MovableSprite s : this ) {
+            s.setSpeed( newSpeed );
         }
     }
     
@@ -28,10 +34,10 @@ public class SpriteGroup extends ArrayList<MovableSprite> implements Serializabl
         }
     }
     
-    public void moveAll( SpriteGroup[] sprites )
+    public void moveAll( SpriteGroup[] sprites, SpriteGroup terrain )
     {
         for ( MovableSprite s : this ) {
-            s.move( sprites );
+            s.move( sprites, terrain );
         }
     }
     

@@ -20,13 +20,16 @@ public class MovableSprite extends ImageSprite
      * 
      */
     private static final long serialVersionUID = SERIAL_ID;
+    public static Object loader;
 
     public int[] delta = new int[NUMDIR];
     private String name = "";
+    private int speed;
     
     public MovableSprite( String imgFile )
     {
         super( makeTransparent( toImage( imgFile ), java.awt.Color.WHITE ) );
+        speed = 1;
     }
 
     @Override
@@ -43,7 +46,12 @@ public class MovableSprite extends ImageSprite
      */
     public int getSpeed()
     {
-        return 1;
+        return speed;
+    }
+    
+    public void setSpeed( int newSpeed )
+    {
+        speed = newSpeed;
     }
 
     /**
@@ -66,19 +74,19 @@ public class MovableSprite extends ImageSprite
         // System.out.println( " - " + dx + ", " + dy + " = " + getX() + ", " + getY() );
     }
     
-    public void move( SpriteGroup[] sprites )
+    public void move( SpriteGroup[] sprites, SpriteGroup terrain )
     {
         move( dx(), 0 );
-        if ( colliding( sprites ) )
+        if ( colliding( sprites ) || colliding( terrain ) )
             move( -dx(), 0 );
         move( 0, dy() );
-        if ( colliding( sprites ) )
+        if ( colliding( sprites ) || colliding( terrain ) )
             move( 0, -dy() );
     }
     
-    protected boolean colliding( SpriteGroup[] sprites )
+    public boolean colliding( SpriteGroup... sprites )
     {
-      for ( int i = 0; i < WEAPONS; i++ )
+      for ( int i = 0; i < sprites.length; i++ )
       {
           for ( MovableSprite s : sprites[i] )
           {
@@ -119,9 +127,12 @@ public class MovableSprite extends ImageSprite
      */
     public void setDelta( int d )
     {
-        stop( d );
-        // System.out.println( getName() + ", setDelta: " + d +" " + delta[d] );
-        delta[d] = getSpeed();
+        if ( isDirection( d ) )
+        {
+            stop( d );
+            // System.out.println( getName() + ", setDelta: " + d +" " + delta[d] );
+            delta[d] = getSpeed();
+        }
     }
     
     /**
@@ -130,7 +141,7 @@ public class MovableSprite extends ImageSprite
      */
     public void stop( int d )
     {
-        if ( d < 0 || d > NUMDIR ) return;
+        if ( !isDirection( d ) ) return;
         if ( d % 2 == 0 ) {
             delta[NORTH] = 0;
             delta[SOUTH] = 0;
@@ -149,6 +160,11 @@ public class MovableSprite extends ImageSprite
         stop( NORTH );
         stop( WEST );
         // for ( int i = 0; i < NUMDIR; i++ ) delta[i] = 0;
+    }
+    
+    public boolean isDirection( int d )
+    {
+        return d >= 0 && d < NUMDIR;
     }
     
     /**
@@ -178,8 +194,8 @@ public class MovableSprite extends ImageSprite
     {
         // System.out.println( System.getProperty( "user.dir" ) + " " + fileName );
         try { 
-            return javax.imageio.ImageIO.read( new java.io.File( fileName ) );
-        } catch ( java.io.IOException e ) { 
+            return javax.imageio.ImageIO.read( MovableSprite.class.getResource( fileName ) );
+        } catch ( Exception e ) { 
             System.out.println( "Cannot find: " + fileName );
             e.printStackTrace(); 
             @SuppressWarnings("resource")

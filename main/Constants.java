@@ -31,10 +31,9 @@ public final class Constants
     
     // Sprite Array constants
     public static final int PLAYERS = 0;
-    public static final int TERRAIN = 1;
-    public static final int ENEMIES = 2;
-    public static final int WEAPONS = 3;
-    public static final int SPRITE_LENGTH = 4;
+    public static final int ENEMIES = 1;
+    public static final int WEAPONS = 2;
+    public static final int SPRITE_LENGTH = 3;
 
     // Stat values
     public final static int LEVEL = 0;
@@ -59,10 +58,10 @@ public final class Constants
     // Window
     public static final long SERIAL_ID = 1L;
 //    public static final String PACKAGE = "";
-    public static final String PACKAGE = "images/";
+    public static final String PACKAGE = "/images/";
     public static final java.awt.Insets INSETS = new java.awt.Insets( 25, 3, 3, 3 );
-    public static final int WINDOW_WIDTH = 500;
-    public static final int WINDOW_HEIGHT = 500;
+    public static final int WINDOW_WIDTH = 1280;
+    public static final int WINDOW_HEIGHT = 720;
     public static final java.awt.Point CENTER = 
                     new java.awt.Point( WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 );
     // private static final int wOffSet = 5;

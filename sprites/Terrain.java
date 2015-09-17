@@ -20,7 +20,7 @@ public class Terrain extends StatsSprite
     {
         super( imgFile );
         int[] stat = new int[STATLENGTH];
-        for ( int i = 0; i < STATLENGTH; i++ ) stat[i] = TERRAIN;
+//        for ( int i = 0; i < STATLENGTH; i++ ) stat[i] = TERRAIN;
         setStats( stat );
     }
     
